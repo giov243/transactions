@@ -6,6 +6,7 @@ import re
 from google.oauth2.service_account import Credentials
 import gspread
 from google import genai
+from google.genai import types
 
 # ─────────────────────────────────────────────
 # CONFIG
@@ -105,28 +106,20 @@ def text_to_sql(question: str) -> str:
     schema = get_schema()
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-    prompt = f"""Sei un esperto SQL. Converti la domanda in linguaggio naturale in una query SQL valida per SQLite.
-
-Tabella: {TABLE_NAME}
-Colonne: {schema}
-
-Regole:
-- Restituisci SOLO la query SQL grezza, senza markdown, senza spiegazioni.
-- Per domande che leggono dati usa SELECT.
-- Per modifiche usa UPDATE, INSERT o DELETE.
-- Usa nomi colonne esatti come indicato sopra.
-
+    prompt = f"""Sei un esperto SQL...
 Domanda: {question}"""
 
-    response = genai.generate_text(
+    response = genai.models.generate_content(
         model="gemini-1.5",
-        prompt=prompt,
-        temperature=0,
-        top_p=0.95,
-        top_k=20,
+        contents=[types.Part.from_text(text=prompt)],
+        config=types.GenerateContentConfig(
+            temperature=0,
+            top_p=0.95,
+            top_k=20,
+        ),
     )
 
-    sql = response.text.strip()
+    sql = response.candidates[0].content[0].text.strip()
     sql = re.sub(r"^```sql|^```|```$", "", sql, flags=re.MULTILINE).strip()
     return sql
 
