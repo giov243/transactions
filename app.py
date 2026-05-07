@@ -104,7 +104,7 @@ def apply_sql_write(query: str):
 # ─────────────────────────────────────────────
 def text_to_sql(question: str) -> str:
     schema = get_schema()
-    client = genai.Client(api_key='GEMINI_API_KEY')
+    client = genai.Client(api_key='AIzaSyBJ9S-njoq5EhZjms4lsTTIt5_Ki9vcpWc')
 
     prompt = f"""Sei un esperto SQL...
 Domanda: {question}"""
