@@ -110,7 +110,7 @@ def text_to_sql(question: str) -> str:
 Domanda: {question}"""
 
     response = client.models.generate_content(
-        model="gemini-1.5-pro",
+        model="gemini-3.5-pro",
         contents=[types.Part.from_text(text=prompt)],
         config=types.GenerateContentConfig(
             temperature=0,
