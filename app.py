@@ -23,7 +23,7 @@ TABLE_NAME = "transactions"
 
 # ─────────────────────────────────────────────
 # GOOGLE SHEETS
-# ─────────────────────────────────────────────
+# ──────────────────────────────────x───────────
 @st.cache_resource
 def get_gsheet_client():
     creds_dict = json.loads(st.secrets["GOOGLE_CREDENTIALS"])
@@ -104,13 +104,13 @@ def apply_sql_write(query: str):
 # ─────────────────────────────────────────────
 def text_to_sql(question: str) -> str:
     schema = get_schema()
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    client = genai.Client(api_key='GEMINI_API_KEY')
 
     prompt = f"""Sei un esperto SQL...
 Domanda: {question}"""
 
-    response = genai.models.generate_content(
-        model="gemini-1.5",
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",
         contents=[types.Part.from_text(text=prompt)],
         config=types.GenerateContentConfig(
             temperature=0,
