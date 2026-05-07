@@ -3,9 +3,9 @@ import pandas as pd
 import sqlite3
 import json
 import re
-import google.generativeai as genai
 from google.oauth2.service_account import Credentials
 import gspread
+from google import genai
 
 # ─────────────────────────────────────────────
 # CONFIG
@@ -104,7 +104,6 @@ def apply_sql_write(query: str):
 def text_to_sql(question: str) -> str:
     schema = get_schema()
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-1.5")
 
     prompt = f"""Sei un esperto SQL. Converti la domanda in linguaggio naturale in una query SQL valida per SQLite.
 
@@ -119,9 +118,15 @@ Regole:
 
 Domanda: {question}"""
 
-    response = model.generate_content(prompt)
+    response = genai.generate_text(
+        model="gemini-1.5",
+        prompt=prompt,
+        temperature=0,
+        top_p=0.95,
+        top_k=20,
+    )
+
     sql = response.text.strip()
-    # rimuove eventuali backtick residui
     sql = re.sub(r"^```sql|^```|```$", "", sql, flags=re.MULTILINE).strip()
     return sql
 
@@ -233,7 +238,6 @@ if st.button("✨ Genera ed esegui SQL", type="primary", disabled=not question):
                 if err:
                     st.session_state.sql_result = ("error", err)
                 else:
-                    # ricarica df aggiornato
                     st.session_state.df = load_from_sqlite()
                     st.session_state.sql_result = ("write", rowcount)
         except Exception as e:
