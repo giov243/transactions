@@ -104,7 +104,7 @@ def apply_sql_write(query: str):
 def text_to_sql(question: str) -> str:
     schema = get_schema()
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-1.5")
 
     prompt = f"""Sei un esperto SQL. Converti la domanda in linguaggio naturale in una query SQL valida per SQLite.
 
